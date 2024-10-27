@@ -101,13 +101,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Conclusion
 The Faculty Management System significantly enhances the efficiency and effectiveness of managing educational institution tasks, fostering a better learning environment for students and a more streamlined administrative process for staff.
 
----
 
-**Developed by Team Titans**
-## Collaborators
-- [Ketul Prajapati - @ketul-prajapati](https://github.com/Ketul-Prajapati)
-- [Himilsinh Sindha - @himilsinh-sindha](https://github.com/himilsinh-sindha)
-- [Preet Mistry - @preet-mistry](https://github.com/Preet2003)
-- [Manav Parmar - @manav-parmar](https://github.com/Parmar-Manav)
-
-*Feel free to reach out for any questions or collaboration opportunities!*
