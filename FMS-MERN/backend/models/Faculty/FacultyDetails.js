@@ -45,6 +45,15 @@ const facultyDetails = new mongoose.Schema({
     type: String,
     required: true,
   },
+  education: {
+    type: [{}]
+  },
+  projects: {
+    type: [{}]
+  },
+  phds: {
+    type: [{}],
+  },
   timestamp: {
     type: Date,
     default: Date.now,

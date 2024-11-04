@@ -3,9 +3,10 @@ const router = express.Router();
 const adminCredential = require("../../models/Admin/AdminCredentials");
 
 router.post("/login", async (req, res) => {
-  let { loginid, password } = req.body;
+  const { loginid, password } = req.body;
   try {
-    let user = await adminCredential.findOne({ loginid });
+    let user = await adminCredential.findOne({ loginid: loginid });
+    console.log(req.body, user)
     if (!user) {
       return res
         .status(400)

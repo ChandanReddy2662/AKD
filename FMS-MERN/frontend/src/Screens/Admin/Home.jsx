@@ -150,9 +150,7 @@ const Home = () => {
           </div>
           <>
             {selectedMenu === "Notice" && <Notice />}
-            {selectedMenu === "Student" && <Student />}
             {selectedMenu === "Faculty" && <Faculty />}
-            {selectedMenu === "Subjects" && <Subjects />}
             {selectedMenu === "Admin" && <Admin />}
             {selectedMenu === "Profile" && <Profile />}
           </>

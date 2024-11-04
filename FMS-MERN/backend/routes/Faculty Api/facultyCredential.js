@@ -21,15 +21,18 @@ router.post("/login", async (req, res) => {
       message: "Login Successfull!",
       loginid: user.loginid,
       id: user.id,
+      firstTimeLogin: user.firstTimeLogin
     };
     res.json(data);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 
 router.post("/register", async (req, res) => {
-  let { loginid, password } = req.body;
+  let { loginid } = req.body;
+  console.log(req.body)
   try {
     let user = await FacultyCredentials.findOne({ loginid });
     if (user) {
@@ -39,8 +42,8 @@ router.post("/register", async (req, res) => {
       });
     }
     user = await FacultyCredentials.create({
-      loginid,
-      password,
+      loginid: loginid,
+      password: loginid,
     });
     const data = {
       success: true,
@@ -50,6 +53,7 @@ router.post("/register", async (req, res) => {
     };
     res.json(data);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
@@ -94,5 +98,6 @@ router.delete("/delete/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
+
 
 module.exports = router;

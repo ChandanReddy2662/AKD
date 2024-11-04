@@ -11,22 +11,26 @@ const Login = () => {
   const [selected, setSelected] = useState("Admin");
   const { register, handleSubmit } = useForm();
   const [showPassword, setShowPassword] = useState(false);
+  const [mode, setMode] = useState("Login")
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (data.login !== "" && data.password !== "") {
       const headers = {
         "Content-Type": "application/json",
       };
-      toast.loading("Logging")
-      axios
-        .post(`${baseApiURL()}/${selected.toLowerCase()}/auth/login`, data, {
+      toast.loading(mode === "Login" ? "Logging": "Signing Up")
+      console.log(process.env.REACT_APP_API_URL)
+      await axios
+        .post(`${baseApiURL()}/${selected.toLowerCase()}/auth/${mode.toLowerCase()}`, data, {
           headers: headers,
         })
         .then((response) => {
-          toast.dismiss();
+          toast.dismiss();  
+          console.log(response)
+          localStorage.setItem("firstLogin", response.data.firstTimeLogin)
           navigate(`/${selected.toLowerCase()}`, {
             state: { type: selected, loginid: response.data.loginid },
           });
@@ -45,9 +49,25 @@ const Login = () => {
         <img
           className="mx-auto mb-6 w-40 z-10"
           src="/image.png"
-          alt="CSProConnect"
+          alt="logo"
           />
-        <h2 className="text-3xl font-semibold mb-6 flex items-center justify-center">{selected} Login</h2>
+
+        {/* Login/Signup Toggle */}
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={() => setMode("Login")}
+            className={`text-lg font-semibold px-4 py-2 ${mode === "Login" ? "text-blue-500 border-b-2 border-blue-500" : "text-gray-500"} hover:text-blue-500`}
+          >
+            Login
+          </button>
+          {/* <button
+            onClick={() => setMode("Register")}
+            className={`text-lg font-semibold px-4 py-2 ${mode === "Register" ? "text-blue-500 border-b-2 border-blue-500" : "text-gray-500"} hover:text-blue-500`}
+          >
+            Register
+          </button> */}
+        </div>
+        <h2 className="text-3xl font-semibold mb-6 flex items-center justify-center">{selected} {mode}</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-4">
         <label htmlFor="loginid" className="block text-gray-600">
@@ -104,13 +124,7 @@ const Login = () => {
           >
             Faculty
           </button>
-          <button
-            className={`text-blue-500 font-semibold hover:text-blue-700 transition duration-300 ease-in-out ${selected === "Student" && "border-b-2 border-blue-500"
-              }`}
-            onClick={() => setSelected("Student")}
-          >
-            Student
-          </button>
+          
         </div>
         
       </div>

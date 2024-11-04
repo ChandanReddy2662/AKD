@@ -4,7 +4,7 @@ const app = express();
 connectToMongo();
 const port = process.env.PORT || 5000;
 var cors = require("cors");
-
+require('dotenv').config()
 app.use(cors());
 app.use(express.json()); //to convert request data to json
 

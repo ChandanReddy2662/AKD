@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const facultyDetails = require("../../models/Faculty/FacultyDetails");
+const FacultyCredentials = require("../../models/Faculty/FacultyCredentials");
 
 router.post("/getDetails", async (req, res) => {
   try {
@@ -23,6 +24,7 @@ router.post("/getDetails", async (req, res) => {
 
 router.post("/addDetails", async (req, res) => {
   try {
+    console.log(req.body)
     let user = await facultyDetails.findOne({
       employeeId: req.body.employeeId,
     });
@@ -38,9 +40,11 @@ router.post("/addDetails", async (req, res) => {
       message: "Faculty Details Added!",
       newFaculty
     };
+    await FacultyCredentials.findByIdAndUpdate({loginid: req.body.employeeId}, {firstTimeLogin: false})
     res.json(data);
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.log(error)
+      res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 

@@ -9,15 +9,63 @@ import Material from "./Material";
 import Marks from "./Marks";
 import Student from "./Student";
 import Attendance from "./Attendance";
+import FacultyEditForm from "./FacultyEditForm";
+import axios from "axios";
+import { baseApiURL } from "../../baseUrl";
+
+import toast from "react-hot-toast";
 const Home = () => {
   const router = useLocation();
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("My Profile");
   const [load, setLoad] = useState(false);
+  const [firstLogin, setFirstLogin] = useState(false)
+  const [data, setData] = useState({})
+  const [id, setId] = useState(null)
+
+  const fetchFaculty= async () => {
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    await axios
+      .post(
+        `${baseApiURL()}/faculty/details/getDetails`,
+        { employeeId: localStorage.getItem("id") },
+        { headers }
+      )
+      .then((response) => {
+        toast.dismiss();
+        if (response.data.success) {
+          toast.success(response.data.message);
+          setId(response.data.user[0]._id);
+          setData({
+            employeeId: response.data.user[0].employeeId,
+            firstName: response.data.user[0].firstName,
+            middleName: response.data.user[0].middleName,
+            lastName: response.data.user[0].lastName,
+            email: response.data.user[0].email,
+            phoneNumber: response.data.user[0].phoneNumber,
+            post: response.data.user[0].post,
+            // department: response.data.user[0].department,
+            gender: response.data.user[0].gender,
+            profile: response.data.user[0].profile,
+            experience: response.data.user[0].experience,
+          });
+        } else {
+          toast.error(response.data.message);
+        }
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+        console.error(error);
+      });
+  }
+
   useEffect(() => {
     if (router.state === null) {
       navigate("/");
     }
+    setFirstLogin(localStorage.getItem("firstLogin"))
     setLoad(true);
   }, [navigate, router.state]);
 
@@ -102,10 +150,10 @@ const Home = () => {
             {selectedMenu === "Timetable" && <Timetable />}
             {selectedMenu === "Attendance" && <Attendance />}
             {selectedMenu === "Upload Marks" && <Marks />}
-            {selectedMenu === "Material" && <Material />}
+            {/* {selectedMenu === "Material" && <Material />} */}
             {selectedMenu === "Notice" && <Notice />}
-            {selectedMenu === "My Profile" && <Profile />}
-            {selectedMenu === "Student Info" && <Student />}
+            {selectedMenu === "My Profile" && <FacultyEditForm firstLogin={firstLogin} facultyData={data} setFirstLogin={setFirstLogin} />}
+            {/* {selectedMenu === "Student Info" && <Student />} */}
           </>
         </>
       )}

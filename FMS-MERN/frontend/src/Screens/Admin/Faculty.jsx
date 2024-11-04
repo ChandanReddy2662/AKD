@@ -157,72 +157,136 @@ const Faculty = () => {
     sendMailgunEmail(email, subject, templateName, templateData);
   }
 
-  const addFacultyProfile = (e) => {
+  // const addFacultyProfile = async (e) => {
+  //   e.preventDefault();
+  //   toast.loading("Adding Faculty");
+  //   const headers = {
+  //     "Content-Type": "application/json",
+  //   };
+  //   await axios
+  //     .post(`${baseApiURL()}/faculty/details/addDetails`, data, {
+  //       headers: headers,
+  //     })
+  //     .then((response) => {
+  //       toast.dismiss();
+  //       if (response.data.success) {
+  //         toast.success(response.data.message);
+  //         const password = generateRandomPassword();
+  //         const templateName = 'successful registration'; // Replace with the name of your Mailgun template
+  //         const templateData = {
+  //           // Define variables used in your template
+  //           'recipientName': data.firstName + ' ' + data.lastName,
+  //           'username': data.employeeId,
+  //           'password': password
+  //         };
+  //         sendLoginCredentials(data.email, templateName, templateData); // Implement this function
+  //         axios
+  //           .post(
+  //             `${baseApiURL()}/faculty/auth/register`,
+  //             { loginid: data.employeeId, password },
+  //             {
+  //               headers: headers,
+  //             }
+  //           )
+  //           .then((response) => {
+  //             toast.dismiss();
+  //             if (response.data.success) {
+  //               toast.success(response.data.message);
+  //               setFile();
+  //               setData({
+  //                 employeeId: "",
+  //                 firstName: "",
+  //                 middleName: "",
+  //                 lastName: "",
+  //                 email: "",
+  //                 phoneNumber: "",
+  //                 // department: "",
+  //                 gender: "",
+  //                 experience: "",
+  //                 post: "",
+  //                 profile: "",
+  //               });
+  //             } else {
+  //               toast.error(response.data.message);
+  //             }
+  //           })
+  //           .catch((error) => {
+  //             toast.dismiss();
+  //             toast.error(error.response.data.message);
+  //           });
+  //       } else {
+  //         toast.error(response.data.message);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       toast.dismiss();
+  //       toast.error(error.response.data.message);
+  //     });
+  // };
+
+  const addFacultyProfile = async (e) => {
     e.preventDefault();
     toast.loading("Adding Faculty");
+  
     const headers = {
       "Content-Type": "application/json",
     };
-    axios
-      .post(`${baseApiURL()}/faculty/details/addDetails`, data, {
-        headers: headers,
-      })
-      .then((response) => {
+  
+    try {
+      // Send request to add faculty details using only the employeeId
+      const response = await axios.post(
+        `${baseApiURL()}/faculty/auth/register`,
+        { loginid: data.employeeId, password: data.employeeId },
+        { headers }
+      );
+  
+      toast.dismiss();
+  
+      if (response.data.success) {
+        toast.success(response.data.message);
+  
+        // Generate a random password for the new faculty account
+        const password = generateRandomPassword();
+  
+        // Set up the template data for the email
+        const templateName = 'successful registration'; // Update with the correct Mailgun template name
+        const templateData = {
+          recipientName: data.employeeId,  // Since no name is provided, using employeeId as a placeholder
+          username: data.employeeId,
+          password,
+        };
+  
+        // Send login credentials email
+        sendLoginCredentials(data.email, templateName, templateData);
+  
+        // Register the faculty with auth details (login id and password)
+        const registerResponse = await axios.post(
+          `${baseApiURL()}/faculty/auth/register`,
+          { loginid: data.employeeId, password },
+          { headers }
+        );
+  
         toast.dismiss();
-        if (response.data.success) {
-          toast.success(response.data.message);
-          const password = generateRandomPassword();
-          const templateName = 'successful registration'; // Replace with the name of your Mailgun template
-          const templateData = {
-            // Define variables used in your template
-            'recipientName': data.firstName + ' ' + data.lastName,
-            'username': data.employeeId,
-            'password': password
-          };
-          sendLoginCredentials(data.email, templateName, templateData); // Implement this function
-          axios
-            .post(
-              `${baseApiURL()}/faculty/auth/register`,
-              { loginid: data.employeeId, password },
-              {
-                headers: headers,
-              }
-            )
-            .then((response) => {
-              toast.dismiss();
-              if (response.data.success) {
-                toast.success(response.data.message);
-                setFile();
-                setData({
-                  employeeId: "",
-                  firstName: "",
-                  middleName: "",
-                  lastName: "",
-                  email: "",
-                  phoneNumber: "",
-                  // department: "",
-                  gender: "",
-                  experience: "",
-                  post: "",
-                  profile: "",
-                });
-              } else {
-                toast.error(response.data.message);
-              }
-            })
-            .catch((error) => {
-              toast.dismiss();
-              toast.error(error.response.data.message);
-            });
+  
+        if (registerResponse.data.success) {
+          toast.success(registerResponse.data.message);
+  
+          // Clear the form fields
+          setData({
+            employeeId: "",
+          });
         } else {
-          toast.error(response.data.message);
+          toast.error(registerResponse.data.message);
         }
-      })
-      .catch((error) => {
-        toast.dismiss();
-        toast.error(error.response.data.message);
-      });
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error(error.response?.data?.message || "An error occurred");
+    }
   };
+  
 
   const updateFacultyProfile = (e) => {
     e.preventDefault();
@@ -385,9 +449,9 @@ const Faculty = () => {
       {selected === "add" && (
         <form
           onSubmit={addFacultyProfile}
-          className="w-[70%] flex justify-center items-center flex-wrap gap-8 mx-auto mt-10"
+          className="w-[70%] flex justify-center flex-col items-center flex-wrap gap-8 mx-auto mt-10"
         >
-          <div className="w-[40%]">
+          {/* <div className="w-[40%]">
             <label htmlFor="firstname" className="leading-7 text-sm ">
               Enter First Name
             </label>
@@ -422,7 +486,7 @@ const Faculty = () => {
               onChange={(e) => setData({ ...data, lastName: e.target.value })}
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
-          </div>
+          </div> */}
           <div className="w-[40%]">
             <label htmlFor="employeeId" className="leading-7 text-sm ">
               Enter Employee Id
@@ -435,7 +499,7 @@ const Faculty = () => {
               className="w-full bg-blue-50 rounded border focus:border-dark-green focus:bg-secondary-light focus:ring-2 focus:ring-light-green text-base outline-none py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
           </div>
-          <div className="w-[40%]">
+          {/* <div className="w-[40%]">
             <label htmlFor="email" className="leading-7 text-sm ">
               Enter Email Address
             </label>
@@ -521,7 +585,7 @@ const Faculty = () => {
               id="file"
               onChange={(e) => setFile(e.target.files[0])}
             />
-          </div>
+          </div> */}
           <button
             type="submit"
             className="bg-blue-500 px-6 py-3 rounded-sm my-6 text-white"
