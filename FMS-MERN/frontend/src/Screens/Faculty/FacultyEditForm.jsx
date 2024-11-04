@@ -138,6 +138,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
     userData.education = education
     userData.phds = phds
     userData.projects = projects
+    userData.employeeId = localStorage.getItem("id")
     console.log(userData)
 
     try{ 
@@ -312,7 +313,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
                   className="mt-1 block w-full"
                   disabled={!firstLogin}
                   name="profilePhoto"
-                  onChange={(e) => {setFile(e.target.value)}}
+                  onChange={(e) => {setFile(e.target.files[0])}}
                 />
               </label>
             </div>
