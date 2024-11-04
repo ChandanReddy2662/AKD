@@ -36,7 +36,8 @@ const Profile = () => {
               enrollmentNo: response.data.user[0].enrollmentNo,
               // branch: response.data.user[0].branch,
             })
-          );
+          );    
+          console.log(response.data.user[0])
         } else {
           toast.error(response.data.message);
         }

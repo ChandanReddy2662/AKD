@@ -36,7 +36,7 @@ router.post("/register", async (req, res) => {
   try {
     let user = await FacultyCredentials.findOne({ loginid });
     if (user) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "User With This LoginId Already Exists",
       });

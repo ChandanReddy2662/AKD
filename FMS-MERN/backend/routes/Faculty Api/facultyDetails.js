@@ -5,8 +5,9 @@ const FacultyCredentials = require("../../models/Faculty/FacultyCredentials");
 
 router.post("/getDetails", async (req, res) => {
   try {
+    console.log(req.body)
     let user = await facultyDetails.find(req.body);
-    if (!user) {
+    if (!user || !(user.length > 0)) {
       return res
         .status(400)
         .json({ success: false, message: "No Faculty Found" });
@@ -18,6 +19,7 @@ router.post("/getDetails", async (req, res) => {
     };
     res.json(data);
   } catch (error) {
+    
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
@@ -40,7 +42,7 @@ router.post("/addDetails", async (req, res) => {
       message: "Faculty Details Added!",
       newFaculty
     };
-    await FacultyCredentials.findByIdAndUpdate({loginid: req.body.employeeId}, {firstTimeLogin: false})
+    await FacultyCredentials.findOneAndUpdate({loginid: req.body.employeeId}, {firstTimeLogin: false})
     res.json(data);
   } catch (error) {
     console.log(error)

@@ -7,11 +7,11 @@ import toast from "react-hot-toast";
 
 
 const emptyFacultyData = {
-    employeeId: "510",
+    employeeId: parseInt(localStorage.getItem("id")),
     firstName: '',
     middleName: '',
     lastName: '',
-    age: '',
+    age: 0,
     phoneNumber: '',
     gender: '',
     experience: '',
@@ -19,13 +19,13 @@ const emptyFacultyData = {
     department: '',
     email: '',
     profilePhoto: '',
-    education: [], // Empty array for education
-    phds: [] ,
-    projects: []      // Empty array for PhDs
+    education_: [],
+    phds_: [] ,
+    projects_: []
   };
   
 
-const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
+const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
   const {
     employeeId,
     firstName,
@@ -42,16 +42,22 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
     education_ = [],
     phds_ = [],
     projects_ = []
-  } = facultyData || emptyFacultyData;
+  } = JSON.parse(localStorage.getItem("user")) || emptyFacultyData;
 
   const [file, setFile] = useState(null)
 
-  const [userData, setUserData] = useState(emptyFacultyData)
-  const [education, setEducation] = useState(education_ || []);
+  const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("user"))?JSON.parse(localStorage.getItem("user")):emptyFacultyData)
+  const [education, setEducation] = useState(education_ ||  []);
   const [phds, setPhds] = useState(phds_ || []);
   const [projects, setProjects] = useState(projects_ || []);
 
   useEffect(() => {
+    console.log(profile, userData)
+    console.log(JSON.parse(localStorage.getItem("user")))
+    console.log(firstLogin)
+    setEducation(JSON.parse(localStorage.getItem("user")).education || [])
+    setPhds(JSON.parse(localStorage.getItem("user")).phds || [])
+    setProjects(JSON.parse(localStorage.getItem("user")).projects || [])
     const uploadFileToStorage = async (file) => {
       toast.loading("Upload Photo To Storage");
       const storageRef = ref(
@@ -73,28 +79,27 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
             setFile();
             toast.success("Profile Uploaded To Faculty");
             setUserData({ ...userData, profile: downloadURL });
+            console.log(downloadURL, "url", userData)
           });
         }
       );
     };
     file && uploadFileToStorage(file);
-  })
-  // Add a new education item
+  }, [file, userData])
+  
   const handleAddEducation = () => {
     setEducation([...education, {type: "", score: ""}]);
   };
 
-  // Add a new PhD entry
+  
   const handleAddPhd = () => {
     setPhds([...phds, { name: "", type: "", yearCompleted: "" }]);
   };
 
-  // Add a new project entry
   const handleAddProject = () => {
     setProjects([...projects, { title: "", description: "" }]);
   };
 
-  // Handle changes to education, phds, and projects inputs
   const handleEducationChange = (index, name,  value) => {
     const updatedEducation = [...education];
     updatedEducation[index][name] = value;
@@ -117,12 +122,10 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
     setEducation(education.filter((_, i) => i !== index));
   };
 
-  // Remove an item from PhDs
   const handleRemovePhd = (index) => {
     setPhds(phds.filter((_, i) => i !== index));
   };
 
-  // Remove an item from projects
   const handleRemoveProject = (index) => {
     setProjects(projects.filter((_, i) => i !== index));
   };
@@ -137,23 +140,17 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
     userData.projects = projects
     console.log(userData)
 
-    const formData = new FormData();
-    Object.entries(userData).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
-    try{
-      
+    try{ 
       const response = await axios.post(`${baseApiURL()}/faculty/details/addDetails`, userData)
-      
+      console.log(response.data)
+      localStorage.removeItem("firstLogin")
+      setFirstLogin(false)
     }
     catch(err){
       console.log(err)
     }
-    
     setFirstLogin(false)
     console.log(firstLogin)
-
   }
 
   return (
@@ -165,7 +162,7 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
         <h3 className="text-xl font-semibold mb-4">Personal Information</h3>
         
         {/* Display or Edit Fields based on firstLogin */}
-        {firstLogin ? (
+        {firstLogin  ? (
           <form>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <label>
@@ -208,8 +205,8 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
               <label>
                 Employee ID:
                 <input
-                  type="text"
-                  defaultValue={employeeId}
+                  type="number"
+                  defaultValue={employeeId || localStorage.getItem("id")}
                   className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
                   disabled
                   name="employeeId"
@@ -243,15 +240,20 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
 
               <label>
                 Gender:
-                <input
-                  type="text"
+                <select
                   defaultValue={gender}
                   className="mt-1 block w-full border border-gray-300 rounded px-3 py-2"
                   disabled={!firstLogin}
                   name="gender"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
               </label>
+
 
               <label>
                 Experience:
@@ -316,24 +318,25 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
             </div>
           </form>
         ) : (
-          <div className="text-gray-700">
-            <p><strong>First Name:</strong> {firstName}</p>
-            <p><strong>Middle Name:</strong> {middleName}</p>
-            <p><strong>Last Name:</strong> {lastName}</p>
-            <p><strong>Employee ID:</strong> {employeeId}</p>
-            <p><strong>Age:</strong> {age}</p>
-            <p><strong>Phone Number:</strong> {phoneNumber}</p>
-            <p><strong>Gender:</strong> {gender}</p>
-            <p><strong>Experience:</strong> {experience} years</p>
-            <p><strong>Post:</strong> {post}</p>
-            <p><strong>Department:</strong> {department}</p>
-            <p><strong>Email:</strong> {email}</p>
+          <div className="flex justify-between items-start bg-white shadow-md rounded-lg p-6">
+            <div className="text-gray-700 grid">
+              <p className="text-lg font-semibold"><strong>Name:</strong> {firstName + middleName + lastName}</p>
+              <p className="text-lg font-semibold"><strong>Employee ID:</strong> {employeeId}</p>
+              <p className="text-lg font-semibold"><strong>Age:</strong> {age}</p>
+              <p className="text-lg font-semibold"><strong>Phone Number:</strong> {phoneNumber}</p>
+              <p className="text-lg font-semibold"><strong>Gender:</strong> {gender}</p>
+              <p className="text-lg font-semibold"><strong>Experience:</strong> {experience} years</p>
+              <p className="text-lg font-semibold"><strong>Post:</strong> {post}</p>
+              <p className="text-lg font-semibold"><strong>Department:</strong> {department}</p>
+              <p className="text-lg font-semibold"><strong>Email:</strong> {email}</p>
+            </div>
             <img
-              src={profile}
+              src={userData.profile}
               alt="Profile"
-              className="mt-3 w-24 h-24 rounded-full border border-gray-300"
+              className="mt-3 w-36 h-36 rounded-xl border border-gray-300 object-cover"
             />
           </div>
+
         )}
       </div>
 
@@ -486,7 +489,7 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
         )}
       </div>
         
-        <div>
+       {firstLogin && <div>
             <button 
             type="submit" 
             className="text-white bg-blue-700 px-6 py-3 border rounded-md hover:bg-blue-400"
@@ -495,7 +498,7 @@ const FacultyEditForm = ({ facultyData, firstLogin, setFirstLogin }) => {
 
                 save
             </button>
-        </div>
+        </div>}
       
     </div>
   );

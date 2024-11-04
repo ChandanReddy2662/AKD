@@ -27,7 +27,7 @@ const Faculty = () => {
     lastName: "",
     email: "",
     phoneNumber: "",
-    // department: "",
+    department: "",
     gender: "",
     experience: "",
     post: "",
@@ -228,56 +228,21 @@ const Faculty = () => {
     e.preventDefault();
     toast.loading("Adding Faculty");
   
-    const headers = {
-      "Content-Type": "application/json",
-    };
-  
     try {
-      // Send request to add faculty details using only the employeeId
+      // Send request to add faculty details
       const response = await axios.post(
         `${baseApiURL()}/faculty/auth/register`,
         { loginid: data.employeeId, password: data.employeeId },
-        { headers }
+        { headers: { "Content-Type": "application/json" } }
       );
   
       toast.dismiss();
-  
+      
       if (response.data.success) {
         toast.success(response.data.message);
   
-        // Generate a random password for the new faculty account
-        const password = generateRandomPassword();
-  
-        // Set up the template data for the email
-        const templateName = 'successful registration'; // Update with the correct Mailgun template name
-        const templateData = {
-          recipientName: data.employeeId,  // Since no name is provided, using employeeId as a placeholder
-          username: data.employeeId,
-          password,
-        };
-  
-        // Send login credentials email
-        sendLoginCredentials(data.email, templateName, templateData);
-  
-        // Register the faculty with auth details (login id and password)
-        const registerResponse = await axios.post(
-          `${baseApiURL()}/faculty/auth/register`,
-          { loginid: data.employeeId, password },
-          { headers }
-        );
-  
-        toast.dismiss();
-  
-        if (registerResponse.data.success) {
-          toast.success(registerResponse.data.message);
-  
-          // Clear the form fields
-          setData({
-            employeeId: "",
-          });
-        } else {
-          toast.error(registerResponse.data.message);
-        }
+        // Clear the form fields
+        setData({ employeeId: "" });
       } else {
         toast.error(response.data.message);
       }
@@ -286,6 +251,7 @@ const Faculty = () => {
       toast.error(error.response?.data?.message || "An error occurred");
     }
   };
+  
   
 
   const updateFacultyProfile = (e) => {
@@ -353,7 +319,7 @@ const Faculty = () => {
             email: response.data.user[0].email,
             phoneNumber: response.data.user[0].phoneNumber,
             post: response.data.user[0].post,
-            // department: response.data.user[0].department,
+            department: response.data.user[0].department,
             gender: response.data.user[0].gender,
             profile: response.data.user[0].profile,
             experience: response.data.user[0].experience,
@@ -410,7 +376,7 @@ const Faculty = () => {
       lastName: "",
       email: "",
       phoneNumber: "",
-      // department: "",
+      department: "",
       gender: "",
       experience: "",
       post: "",

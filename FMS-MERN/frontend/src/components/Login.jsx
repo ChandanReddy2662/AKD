@@ -31,6 +31,7 @@ const Login = () => {
           toast.dismiss();  
           console.log(response)
           localStorage.setItem("firstLogin", response.data.firstTimeLogin)
+          localStorage.setItem("id", response.data.loginid)
           navigate(`/${selected.toLowerCase()}`, {
             state: { type: selected, loginid: response.data.loginid },
           });

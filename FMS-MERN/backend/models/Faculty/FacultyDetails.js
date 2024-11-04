@@ -11,7 +11,6 @@ const facultyDetails = new mongoose.Schema({
   },
   middleName: {
     type: String,
-    required: true,
   },
   lastName: {
     type: String,
@@ -25,10 +24,14 @@ const facultyDetails = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  // department: {
-  //   type: String,
-  //   required: true,
-  // },
+  age: {
+    type: Number,
+    required: true,
+  },
+  department: {
+    type: String,
+    required: true,
+  },
   gender: {
     type: String,
     required: true,
