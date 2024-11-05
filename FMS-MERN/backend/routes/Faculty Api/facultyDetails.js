@@ -15,8 +15,9 @@ router.post("/getDetails", async (req, res) => {
     const data = {
       success: true,
       message: "Faculty Details Found!",
-      user,
+      user: user,
     };
+    
     res.json(data);
   } catch (error) {
     
@@ -52,7 +53,8 @@ router.post("/addDetails", async (req, res) => {
 
 router.post("/updateDetails/:id", async (req, res) => {
   try {
-    let user = await facultyDetails.findByIdAndUpdate(req.params.id, req.body);
+    let user = await facultyDetails.findOneAndUpdate({employeeId: req.params.id}, req.body);
+    console.log(req.body)
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -65,6 +67,7 @@ router.post("/updateDetails/:id", async (req, res) => {
     };
     res.json(data);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
@@ -84,6 +87,7 @@ router.delete("/deleteDetails/:id", async (req, res) => {
     };
     res.json(data);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });

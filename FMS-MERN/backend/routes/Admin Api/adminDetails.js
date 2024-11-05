@@ -15,6 +15,7 @@ router.post("/getDetails", async (req, res) => {
       message: "Admin Details Found!",
       user,
     };
+    console.log(req.body, user)
     res.json(data);
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -47,7 +48,7 @@ router.post("/addDetails", async (req, res) => {
 
 router.post("/updateDetails/:id", async (req, res) => {
   try {
-    let user = await adminDetails.findByIdAndUpdate(req.params.id, req.body);
+    let user = await adminDetails.findOneAndUpdate({employeeId: req.params.id}, req.body);
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -60,6 +61,7 @@ router.post("/updateDetails/:id", async (req, res) => {
     };
     res.json(data);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });

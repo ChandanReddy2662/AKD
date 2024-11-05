@@ -11,6 +11,7 @@ import Subjects from "./Subject";
 import { baseApiURL } from "../../baseUrl";
 import Admin from "./Admin";
 import Profile from "./Profile";
+import FacultyEditForm from "./FacultyEditForm";
 
 const Home = () => {
   const router = useLocation();
@@ -21,6 +22,7 @@ const Home = () => {
     studentCount: "",
     facultyCount: "",
   });
+
   useEffect(() => {
     if (router.state === null) {
       navigate("/");
@@ -96,7 +98,7 @@ const Home = () => {
               >
                 Profile
               </li>
-              <li
+              {/* <li
                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Student"
                     ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
@@ -105,7 +107,7 @@ const Home = () => {
                 onClick={() => setSelectedMenu("Student")}
               >
                 Student
-              </li>
+              </li> */}
               <li
                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Faculty"
@@ -126,7 +128,7 @@ const Home = () => {
               >
                 Notice
               </li>
-              <li
+              {/* <li
                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Subjects"
                     ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
@@ -135,7 +137,7 @@ const Home = () => {
                 onClick={() => setSelectedMenu("Subjects")}
               >
                 Subjects
-              </li>
+              </li> */}
               <li
                 className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
                   selectedMenu === "Admin"
@@ -152,7 +154,7 @@ const Home = () => {
             {selectedMenu === "Notice" && <Notice />}
             {selectedMenu === "Faculty" && <Faculty />}
             {selectedMenu === "Admin" && <Admin />}
-            {selectedMenu === "Profile" && <Profile />}
+            {selectedMenu === "Profile" && <FacultyEditForm />}
           </>
         </>
       )}

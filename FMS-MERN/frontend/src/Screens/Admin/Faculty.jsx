@@ -12,6 +12,7 @@ import Mailgun from "mailgun.js";
 import { FaFilePdf, FaFileExcel } from "react-icons/fa";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
+import FacultyInfo from "./FacultyInfo";
 const mailgun = new Mailgun(formData);
 const mg = mailgun.client({ username: 'api', key: `${mailgunApi()}` });
 
@@ -35,6 +36,14 @@ const Faculty = () => {
   });
   const [id, setId] = useState();
   const [search, setSearch] = useState();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState('name');
+  const [expandedRow, setExpandedRow] = useState(null); // State to track expanded row
+
+  const toggleRow = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
+  };
+
   // const getBranchData = () => {
   //   const headers = {
   //     "Content-Type": "application/json",
@@ -52,6 +61,28 @@ const Faculty = () => {
   //       console.error(error);
   //     });
   // };
+
+  const filteredFaculty = faculty.filter((item) => {
+    const fullName = `${item.lastName} ${item.firstName} ${item.middleName}`.toLowerCase();
+    const employeeId = item.employeeId.toString().toLowerCase();
+    
+    // Search within the `phds` array to find any item with a matching `type`
+    const phdsMatch = item.phds && item.phds.some((phd) => 
+      phd.type?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  
+    if (searchType === 'name') {
+      return fullName.includes(searchTerm.toLowerCase());
+    }
+    if (searchType === 'employeeId') {
+      return employeeId.includes(searchTerm.toLowerCase());
+    }
+    if (searchType === 'phs') {
+      return phdsMatch;
+    }
+    return true;
+  });
+  
 
   useEffect(() => {
     const uploadFileToStorage = async (file) => {
@@ -90,7 +121,7 @@ const Faculty = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([
       ["SR NO", "Employee Id", "Name"],
-      ...faculty.map((faculty, index) => [index + 1,
+      ...filteredFaculty.map((faculty, index) => [index + 1,
       faculty.employeeId,
       `${faculty.lastName} ${faculty.firstName} ${faculty.middleName}`,
       ]),
@@ -109,7 +140,7 @@ const Faculty = () => {
       const pdfTitle = `LIST OF FACULTY`;
       doc.text(pdfTitle, 60, 10);
       const columns = ["SR NO", "EMPLOYEE ID", "NAME"];
-      const rows = faculty.map((faculty, index) => [
+      const rows = filteredFaculty.map((faculty, index) => [
         index + 1, faculty.employeeId,
         `${faculty.lastName} ${faculty.firstName} ${faculty.middleName}`,
       ]);
@@ -739,33 +770,80 @@ const Faculty = () => {
       {selected === "view" && (
 
         <div className="mt-8 w-full">
-          <div className="border border-blue-200 shadow-lg rounded-lg mb-4">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-blue-300">
-                  <th className="py-2 px-4 border border-blue-700">SR NO</th>
-                  <th className="py-2 px-4 border border-blue-700">Employee Id</th>
-                  <th className="py-2 px-4 border border-blue-700">Name</th>
-                </tr>
-              </thead>
-              <tbody>
+          <div className="mt-8 w-full">
+      {/* Search Options */}
+      <div className="flex items-center mb-4 space-x-4">
+        <select
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value)}
+          className="p-2 border border-blue-300 rounded shadow-sm focus:outline-none focus:ring focus:border-blue-400"
+        >
+          <option value="name">Name</option>
+          <option value="employeeId">Employee ID</option>
+          <option value="phs">PHS</option>
+        </select>
+        <input
+          type="text"
+          placeholder={`Search by ${searchType === 'name' ? 'Name' : searchType === 'employeeId' ? 'Employee ID' : 'PHS'}`}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="p-2 w-full border border-blue-300 rounded shadow-sm focus:outline-none focus:ring focus:border-blue-400"
+        />
+      </div>
 
-                {faculty.sort((a, b) => {
-                  const lastNameCompare = a.lastName.localeCompare(b.lastName);
-                  if (lastNameCompare !== 0) {
-                    return lastNameCompare;
-                  }
-                  return a.firstName.localeCompare(b.firstName);
-                }).map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-blue-50'}>
-                    <td className="py-2 px-4 border border-blue-700 text-center">{index + 1}</td>
-                    <td className="py-2 px-4 border border-blue-700 text-center">{item.employeeId}</td>
-                    <td className="py-2 px-4 border border-blue-700 text-center">{`${item.lastName} ${item.firstName} ${item.middleName}`}</td>
+      <div className="border border-blue-200 shadow-lg rounded-lg">
+      <table className="w-full border-collapse">
+      <thead>
+        <tr className="bg-blue-300">
+          <th className="py-2 px-4 border border-blue-700">SR NO</th>
+          <th className="py-2 px-4 border border-blue-700">Employee ID</th>
+          <th className="py-2 px-4 border border-blue-700">Name</th>
+          <th className="py-2 px-4 border border-blue-700">Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredFaculty.length > 0 ? (
+          filteredFaculty
+            .sort((a, b) => {
+              const lastNameCompare = a.lastName.localeCompare(b.lastName);
+              return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
+            })
+            .map((item, index) => (
+              <React.Fragment key={index}>
+                <tr className={index % 2 === 0 ? 'bg-white' : 'bg-blue-50'}>
+                  <td className="py-2 px-4 border border-blue-700 text-center">{index + 1}</td>
+                  <td className="py-2 px-4 border border-blue-700 text-center">{item.employeeId}</td>
+                  <td className="py-2 px-4 border border-blue-700 text-center">
+                    {`${item.lastName} ${item.firstName} ${item.middleName}`}
+                  </td>
+                  <td className="py-2 px-4 border border-blue-700 text-center">
+                    <button 
+                      onClick={() => toggleRow(index)} 
+                      className="text-blue-600 hover:underline">
+                      {expandedRow === index ? 'Hide' : 'Show'} Details
+                    </button>
+                  </td>
+                </tr>
+                {expandedRow === index && (
+                  <tr>
+                    <td colSpan="4" className="py-4 px-4">
+                      <FacultyInfo id={item.employeeId} />
+                    </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                )}
+              </React.Fragment>
+            ))
+        ) : (
+          <tr>
+            <td colSpan="4" className="py-4 px-4 text-center text-gray-500">
+              No records found
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+      </div>
+    </div>
           <div className="flex justify-center space-x-4 mt-12">
             <>
               <button

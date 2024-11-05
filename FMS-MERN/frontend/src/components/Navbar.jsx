@@ -46,6 +46,9 @@ const Navbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogout = () => {
+    localStorage.removeItem("user")
+    localStorage.removeItem("firstLogin")
+    localStorage.removeItem("id")
     setIsModalOpen(true);
   };
 

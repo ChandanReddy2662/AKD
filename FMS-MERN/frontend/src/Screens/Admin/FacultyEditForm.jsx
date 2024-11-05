@@ -5,28 +5,32 @@ import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { storage } from "../../firebase/config";
 import toast from "react-hot-toast";
 
+
+const emptyFacultyData = {
+    employeeId: parseInt(localStorage.getItem("id")),
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    age: 0,
+    phoneNumber: '',
+    gender: '',
+    experience: '',
+    post: '',
+    department: '',
+    email: '',
+    profilePhoto: '',
+    education_: [],
+    phds_: [] ,
+    projects_: []
+  };
+  
+
 const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
   
 
   const [file, setFile] = useState(null)
 
-  const [userData, setUserData] = useState({
-                        employeeId: 0,
-                        firstName: "",
-                        middleName: "",
-                        lastName: "",
-                        email: "",
-                        phoneNumber: 0,
-                        age: 0,
-                        department: "",
-                        gender: "",
-                        experience: 0,
-                        post: "",
-                        profile: "",
-                        education: [], 
-                        projects: [],
-                        phds: [],
-                      })
+  const [userData, setUserData] = useState({})
   const [education, setEducation] = useState([]);
   const [phds, setPhds] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -34,16 +38,11 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
 
   useEffect(() => {
     const fetchDetails = async () => {
-      try{
-        const resp = await axios.post(`${baseApiURL()}/faculty/details/getDetails`, {employeeId: JSON.parse(localStorage.getItem('id'))})
-        setUserData(resp.data.user[0])
-        console.log(userData)
-        console.log(resp)
-        localStorage.setItem("user", JSON.stringify(userData))
-      }
-      catch(e){
-        toast.error("No faculty Details found")
-      }
+      const resp = await axios.post(`${baseApiURL()}/admin/details/getDetails`, {employeeId: JSON.parse(localStorage.getItem('id'))})
+      setUserData(resp.data.user[0])
+      console.log(userData)
+      console.log(resp)
+      localStorage.setItem("user", JSON.stringify(userData))
     }
     fetchDetails()
   }, [])
@@ -164,7 +163,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
     console.log(userData)
 
     try{ 
-      const response = await axios.post(`${baseApiURL()}/faculty/details/addDetails`, userData)
+      const response = await axios.post(`${baseApiURL()}/admin/details/addDetails`, userData)
       console.log(response.data)
       localStorage.removeItem("firstLogin")
       setFirstLogin(false)
@@ -186,7 +185,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
     console.log(userData)
 
     try{ 
-      const response = await axios.post(`${baseApiURL()}/faculty/details/updateDetails/${userData.employeeId}`, userData)
+      const response = await axios.post(`${baseApiURL()}/admin/details/updateDetails/${userData.employeeId}`, userData)
       console.log(response.data)
       localStorage.removeItem("firstLogin")
       setFirstLogin(false)
@@ -202,7 +201,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
   return (
     <div className="flex flex-col p-6 bg-whiterounded shadow-md max-w-6xl mx-auto overflow-y-scroll">
       <div className="flex justify-between">
-        <h2 className="text-2xl font-bold mb-6">Faculty Profile</h2>
+        <h2 className="text-2xl font-bold mb-6">Admin Profile</h2>
         <button 
             type="submit" 
             className="text-white bg-blue-700 px-6 py-3 border rounded-md hover:bg-blue-400"
@@ -364,7 +363,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
                 Profile Photo:
                 <input
                   type="file"
-                  accept="images/*"
+                  accept="image/*"
                   className="mt-1 block w-full"
                   disabled={!(firstLogin || edit)}
                   name="profilePhoto"
@@ -587,11 +586,11 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
                   className="border border-gray-300 rounded px-3 py-2"
                   onChange={(e) => handlePhdChange(index, "yearCompleted", e.target.value)}
                 />
-                <input  
+                <input 
                   type="file" 
-                  name="file"
                   accept=".pdf, .doc, .docx, .txt"
                   className="border border-gray-300 rounded px-3 py-2"
+                  name="file"
                   onChange={e => {uploadPhdFileToStorage(index, e.target.name, e.target.files[0])}}
                 />
                 <button
@@ -630,7 +629,7 @@ const FacultyEditForm = ({ firstLogin, setFirstLogin }) => {
               <tbody className="text-gray-700">
                 {phds.map((phd, index) => (
                   <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="py-4 px-6 font-medium border-r border-gray-200"><a href="#" target="_blank">{phd.name}</a></td>
+                    <td className="py-4 px-6 font-medium border-r border-gray-200"><a href="phd.file" target="_blank">{phd.name}</a></td>
                     <td className="py-4 px-6 border-r  border-gray-200">{phd.type}</td>
                     <td className="py-4 px-6">{phd.yearCompleted}</td>
                   </tr>

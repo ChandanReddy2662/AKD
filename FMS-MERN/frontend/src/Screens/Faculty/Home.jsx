@@ -12,6 +12,7 @@ import Attendance from "./Attendance";
 import FacultyEditForm from "./FacultyEditForm";
 import axios from "axios";
 import { baseApiURL } from "../../baseUrl";
+import UploadPHDs from "./UploadPHDs";
 
 const Home = () => {
   const router = useLocation();
@@ -22,40 +23,10 @@ const Home = () => {
   const [data, setData] = useState({});
   const [id, setId] = useState(null);
 
-  const fetchFaculty = async () => {
-    const headers = {
-      "Content-Type": "application/json",
-    };
-    try {
-      const response = await axios.post(
-        `${baseApiURL()}/faculty/details/getDetails`,
-        { employeeId: localStorage.getItem("id") },
-        { headers }
-      );
-      toast.dismiss();
-      console.log(response)
-      if (response.data.success) {
-        toast.success(response.data.message);
-        setId(response.data.user[0]._id);
-        setData({ ...response.data.user[0] });
-        localStorage.setItem("user", JSON.stringify(response.data.user[0]));
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      setData("")
-      
-      localStorage.setItem("user", JSON.stringify({_id: undefined}));
-      // toast.error(error.message);
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     if (router.state === null) {
       navigate("/");
     }
-    fetchFaculty();
     setFirstLogin(localStorage.getItem("firstLogin") === "true");
     setLoad(true);
   }, []);
@@ -76,7 +47,7 @@ const Home = () => {
         >
           My Profile
         </li>
-        <li
+        {/* <li
           className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
             selectedMenu === "Student Info"
               ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
@@ -85,7 +56,7 @@ const Home = () => {
           onClick={() => setSelectedMenu("Student Info")}
         >
           Student Info
-        </li>
+        </li> */}
         <li
           className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
             selectedMenu === "Upload Marks"
@@ -94,7 +65,7 @@ const Home = () => {
           }`}
           onClick={() => setSelectedMenu("Upload Marks")}
         >
-          Upload Marks
+          Upload PHDs
         </li>
         <li
           className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
@@ -126,7 +97,7 @@ const Home = () => {
         >
           Material
         </li>
-        <li
+        {/* <li
           className={`text-center rounded-sm px-4 py-2 w-1/5 cursor-pointer ease-linear duration-300 hover:ease-linear hover:duration-300 hover:transition-all transition-all ${
             selectedMenu === "Attendance"
               ? "border-b-2 pb-2 border-blue-500 bg-blue-100 rounded-sm"
@@ -135,12 +106,12 @@ const Home = () => {
           onClick={() => setSelectedMenu("Attendance")}
         >
           Attendance
-        </li>
+        </li> */}
       </ul>
       <>
         {selectedMenu === "Timetable" && <Timetable />}
         {selectedMenu === "Attendance" && <Attendance />}
-        {selectedMenu === "Upload Marks" && <Marks />}
+        {selectedMenu === "Upload Marks" && <UploadPHDs />}
         {selectedMenu === "Notice" && <Notice />}
         {selectedMenu === "My Profile" && (
           <FacultyEditForm firstLogin={firstLogin} setFirstLogin={setFirstLogin} />
